@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stargazer · Professional Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-light:#E8D5A3;--gold-dark:#8B6914;
+  --deep:#0D0B14;--deep2:#13101E;--panel:#1A1628;--panel2:#221D33;
+  --border:rgba(201,168,76,0.2);--border2:rgba(201,168,76,0.4);
+  --text:#F0EBE0;--muted:#9B94A8;--accent:#7B5EA7;
+  --success:#4CAF82;--warn:#E8A44A;--info:#5EA8C9;
+}
+body{font-family:'Jost',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── LOCK SCREEN ── */
+#lockScreen{position:fixed;inset:0;background:var(--deep);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:2rem}
+.lock-star{font-size:3rem;animation:spin 20s linear infinite;display:block;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lock-title{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;letter-spacing:.15em;color:var(--gold);text-align:center}
+.lock-sub{font-size:.75rem;letter-spacing:.3em;color:var(--muted);text-align:center;text-transform:uppercase}
+.lock-form{display:flex;flex-direction:column;align-items:center;gap:1rem;margin-top:1rem}
+.lock-input{background:transparent;border:1px solid var(--border2);color:var(--text);font-family:'Jost',sans-serif;font-size:1.1rem;letter-spacing:.4em;text-align:center;padding:.8rem 1.5rem;width:220px;border-radius:2px;outline:none;transition:border-color .3s}
+.lock-input:focus{border-color:var(--gold)}
+.lock-btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Jost',sans-serif;font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;padding:.7rem 2rem;cursor:pointer;transition:all .3s;border-radius:2px}
+.lock-btn:hover{background:var(--gold);color:var(--deep)}
+.lock-err{color:#E8A44A;font-size:.8rem;letter-spacing:.1em;min-height:1.2rem}
+.lock-line{width:180px;height:1px;background:var(--border)}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:var(--deep2)}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--gold);letter-spacing:.12em}
+.logo span{font-style:italic;font-weight:300}
+.header-right{display:flex;align-items:center;gap:1.5rem}
+.client-badge{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.logout-btn{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:1px solid var(--border);padding:.3rem .8rem;border-radius:2px;background:transparent;transition:all .2s}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── LAYOUT ── */
+.main-layout{display:flex;flex:1;min-height:calc(100vh - 65px)}
+
+/* ── SIDEBAR ── */
+aside{width:220px;background:var(--deep2);border-right:1px solid var(--border);padding:1.5rem 0;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-section{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);padding:.5rem 1.5rem .3rem;margin-top:.5rem}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.5rem;cursor:pointer;font-size:.8rem;letter-spacing:.08em;color:var(--muted);transition:all .2s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(201,168,76,0.05)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,0.08)}
+.nav-icon{font-size:1rem;width:18px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.sidebar-note{font-size:.65rem;color:var(--muted);letter-spacing:.05em;line-height:1.6}
+
+/* ── CONTENT ── */
+main{flex:1;overflow-y:auto;background:var(--deep)}
+.tab-content{display:none;padding:2rem;max-width:900px}
+.tab-content.active{display:block}
+
+/* ── SECTION TITLES ── */
+.section-header{margin-bottom:2rem}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--gold);letter-spacing:.08em}
+.section-sub{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.3rem}
+
+/* ── FORM ELEMENTS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group.full{grid-column:1/-1}
+label{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+input,select,textarea{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Jost',sans-serif;font-size:.9rem;padding:.65rem 1rem;border-radius:2px;outline:none;transition:border-color .3s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+select option{background:var(--panel)}
+textarea{min-height:80px;resize:vertical}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;padding:.7rem 1.8rem;border-radius:2px;cursor:pointer;transition:all .3s;border:1px solid}
+.btn-primary{background:transparent;border-color:var(--gold);color:var(--gold)}
+.btn-primary:hover{background:var(--gold);color:var(--deep)}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--text);color:var(--text)}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem}
+
+/* ── RESULT CARDS ── */
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin:1.5rem 0}
+.result-card{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:1rem;text-align:center}
+.result-card .num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--gold);line-height:1}
+.result-card .sys{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.3rem}
+.result-card .lbl{font-size:.75rem;color:var(--text);margin-top:.4rem}
+
+.reading-card{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:1.25rem 1.5rem;margin-bottom:.6rem}
+.reading-card .rc-top{display:flex;align-items:baseline;gap:1rem;margin-bottom:.5rem}
+.reading-card .rc-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);font-weight:300}
+.reading-card .rc-sys{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.reading-card .rc-lbl{font-size:.85rem;font-weight:500;color:var(--text)}
+.reading-card .rc-desc{font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:.3rem}
+.tag{display:inline-block;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .7rem;border-radius:1px;margin-top:.5rem}
+.tag-s{background:rgba(76,175,130,0.15);color:var(--success);border:1px solid rgba(76,175,130,0.3)}
+.tag-i{background:rgba(94,168,201,0.15);color:var(--info);border:1px solid rgba(94,168,201,0.3)}
+.tag-w{background:rgba(232,164,74,0.15);color:var(--warn);border:1px solid rgba(232,164,74,0.3)}
+
+/* ── VERDICT ── */
+.verdict{background:var(--panel2);border:1px solid var(--border2);border-radius:2px;padding:1.25rem 1.5rem;margin:1rem 0}
+.verdict-label{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.verdict-text{font-size:.9rem;color:var(--text);line-height:1.7}
+
+/* ── COLOR SWATCHES ── */
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.75rem;margin:1rem 0}
+.swatch{border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+.swatch-color{height:70px}
+.swatch-info{background:var(--panel);padding:.5rem;font-size:.65rem;color:var(--muted);letter-spacing:.05em}
+.swatch-name{color:var(--text);font-size:.75rem;font-weight:500;display:block}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:1rem 0}
+.cal-day-name{text-align:center;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.4rem}
+.cal-day{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:.5rem;text-align:center;cursor:pointer;transition:all .2s;min-height:54px;position:relative}
+.cal-day:hover{border-color:var(--gold)}
+.cal-day.today{border-color:var(--gold)}
+.cal-day.empty{background:transparent;border-color:transparent;cursor:default}
+.cal-day .d-num{font-size:.85rem}
+.cal-day .d-vibe{font-size:.55rem;color:var(--gold);margin-top:2px}
+.cal-day.num1{border-left:2px solid #E8A44A}
+.cal-day.num3{border-left:2px solid #4CAF82}
+.cal-day.num6{border-left:2px solid #7B5EA7}
+.cal-day.num7{border-left:2px solid #5EA8C9}
+.cal-day.num9{border-left:2px solid #C9A84C}
+.cal-day.master{border:1px solid var(--gold);background:rgba(201,168,76,0.08)}
+
+/* ── HERB / STONE GRID ── */
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin:1rem 0}
+.item-card{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:1rem}
+.item-card .ic-icon{font-size:1.4rem;margin-bottom:.4rem}
+.item-card .ic-name{font-size:.85rem;font-weight:500;color:var(--text)}
+.item-card .ic-sub{font-size:.7rem;color:var(--muted);margin-top:.15rem;line-height:1.5}
+
+/* ── REPORT ── */
+#reportOutput{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:2rem;margin-top:1.5rem;font-size:.85rem;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:'Cormorant Garamond',serif;font-size:1rem}
+.copy-hint{font-size:.7rem;color:var(--muted);margin-top:.75rem;letter-spacing:.05em}
+
+/* ── CLIENT STORAGE ── */
+.client-list{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0}
+.client-row{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s}
+.client-row:hover{border-color:var(--gold)}
+.client-name{font-size:.9rem;color:var(--text)}
+.client-date{font-size:.7rem;color:var(--muted)}
+.client-load{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.divider{height:1px;background:var(--border);margin:1.5rem 0}
+</style>
+</head>
+<body>
+
+<!-- ══ LOCK SCREEN ══ -->
+<div id="lockScreen">
+  <span class="lock-star">✦</span>
+  <div>
+    <div class="lock-title">Stargazer</div>
+    <div class="lock-sub" style="margin-top:.4rem">Professional Numerology Suite</div>
+  </div>
+  <div class="lock-line"></div>
+  <div class="lock-form">
+    <div class="lock-sub">Enter access code</div>
+    <input class="lock-input" type="password" id="codeInput" placeholder="· · · · ·" maxlength="10" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <button class="lock-btn" onclick="tryUnlock()">Enter</button>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+  <div style="font-size:.6rem;color:var(--muted);letter-spacing:.15em;margin-top:1rem">Private Access Only · Stargazer © 2025</div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <header>
+    <div class="logo">Star<span>gazer</span></div>
+    <div class="header-right">
+      <span class="client-badge" id="activeClientBadge">No client loaded</span>
+      <span style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .6rem;border:1px solid var(--border);border-radius:2px;color:var(--muted)" id="roleTag"></span>
+      <button class="logout-btn" onclick="logout()">Lock app</button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside>
+      <div class="sidebar-section">Session</div>
+      <div class="nav-item active" onclick="showTab('clients')" id="nav-clients">
+        <span class="nav-icon">👤</span> Clients
+      </div>
+      <div class="sidebar-section">Readings</div>
+      <div class="nav-item" onclick="showTab('numerology')" id="nav-numerology">
+        <span class="nav-icon">🔢</span> Numerology
+      </div>
+      <div class="nav-item" onclick="showTab('astrology')" id="nav-astrology">
+        <span class="nav-icon">♈</span> Astrology
+      </div>
+      <div class="nav-item" onclick="showTab('calendar')" id="nav-calendar">
+        <span class="nav-icon">📅</span> Calendar
+      </div>
+      <div class="sidebar-section">Branding</div>
+      <div class="nav-item" onclick="showTab('colors')" id="nav-colors">
+        <span class="nav-icon">🎨</span> Color Analysis
+      </div>
+      <div class="nav-item" onclick="showTab('scents')" id="nav-scents">
+        <span class="nav-icon">🌿</span> Scents & Herbs
+      </div>
+      <div class="nav-item" onclick="showTab('stones')" id="nav-stones">
+        <span class="nav-icon">💎</span> Crystals & Stones
+      </div>
+      <div class="sidebar-section">Output</div>
+      <div class="nav-item" onclick="showTab('report')" id="nav-report">
+        <span class="nav-icon">✦</span> Generate Report
+      </div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">Stargazer Professional<br>Private access · v1.0<br><br>Reports copy to Canva.</div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main>
+
+      <!-- ── CLIENTS ── -->
+      <div class="tab-content active" id="tab-clients">
+        <div class="section-header">
+          <div class="section-title">Client Profiles</div>
+          <div class="section-sub">Save & load client sessions</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="c_name" placeholder="Client's full name">
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="c_dob">
+          </div>
+          <div class="form-group">
+            <label>Business / Project Name</label>
+            <input type="text" id="c_biz" placeholder="Optional">
+          </div>
+          <div class="form-group">
+            <label>Launch / Event Date</label>
+            <input type="date" id="c_launch">
+          </div>
+          <div class="form-group full">
+            <label>Notes</label>
+            <textarea id="c_notes" placeholder="Session notes, goals, intentions..."></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+          <button class="btn btn-ghost" onclick="clearClient()">Clear Form</button>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem">Saved clients</div>
+        <div class="client-list" id="clientList"><div style="color:var(--muted);font-size:.8rem">No clients saved yet.</div></div>
+      </div>
+
+      <!-- ── NUMEROLOGY ── -->
+      <div class="tab-content" id="tab-numerology">
+        <div class="section-header">
+          <div class="section-title">Numerology · All 7 Systems</div>
+          <div class="section-sub">World numerology profile</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name to analyze</label>
+            <input type="text" id="n_name" placeholder="Full name or business name">
+          </div>
+          <div class="form-group">
+            <label>Date (birth or launch)</label>
+            <input type="date" id="n_date">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="runNumerology()">Run All Systems</button>
+          <button class="btn btn-ghost" onclick="loadClientToNumerology()">Load Current Client</button>
+        </div>
+        <div id="numResults" style="display:none;margin-top:1.5rem">
+          <div class="result-grid" id="numGrid"></div>
+          <div class="verdict" id="numVerdict"></div>
+          <div style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:.75rem 0 .5rem">System readings</div>
+          <div id="numCards"></div>
+        </div>
+      </div>
+
+      <!-- ── ASTROLOGY ── -->
+      <div class="tab-content" id="tab-astrology">
+        <div class="section-header">
+          <div class="section-title">Astrology</div>
+          <div class="section-sub">Partner integration — coming soon</div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:3rem 2rem;text-align:center;margin-top:1rem">
+          <div style="font-size:3rem;margin-bottom:1rem">♈ ♉ ♊ ♋ ♌ ♍</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold);margin-bottom:.75rem">Astrology Module</div>
+          <div style="font-size:.85rem;color:var(--muted);line-height:1.7;max-width:400px;margin:0 auto">
+            This tab is reserved for your partner's astrology system.<br><br>
+            Once integrated, natal charts, transits, and planetary readings will appear here and flow automatically into the generated report.
+          </div>
+          <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.75rem;align-items:center">
+            <div class="form-group" style="width:300px">
+              <label>Sun sign (manual entry for now)</label>
+              <select id="a_sun">
+                <option value="">— select —</option>
+                <option>Aries</option><option>Taurus</option><option>Gemini</option>
+                <option>Cancer</option><option>Leo</option><option>Virgo</option>
+                <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+                <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+              </select>
+            </div>
+            <div class="form-group" style="width:300px">
+              <label>Moon sign</label>
+              <select id="a_moon">
+                <option value="">— select —</option>
+                <option>Aries</option><option>Taurus</option><option>Gemini</option>
+                <option>Cancer</option><option>Leo</option><option>Virgo</option>
+                <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+                <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+              </select>
+            </div>
+            <div class="form-group" style="width:300px">
+              <label>Rising sign</label>
+              <select id="a_rising">
+                <option value="">— select —</option>
+                <option>Aries</option><option>Taurus</option><option>Gemini</option>
+                <option>Cancer</option><option>Leo</option><option>Virgo</option>
+                <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+                <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+              </select>
+            </div>
+            <div class="form-group" style="width:300px">
+              <label>Notes / aspects</label>
+              <textarea id="a_notes" placeholder="Key placements, chart notes..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveAstro()">Save Astrology Notes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CALENDAR ── -->
+      <div class="tab-content" id="tab-calendar">
+        <div class="section-header">
+          <div class="section-title">Cosmic Calendar</div>
+          <div class="section-sub">Numerology-coded date finder</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Life path / key number</label>
+            <input type="number" id="cal_num" min="1" max="9" placeholder="e.g. 6" style="width:120px">
+          </div>
+          <div class="form-group">
+            <label>Month to view</label>
+            <input type="month" id="cal_month">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="buildCalendar()">Show Cosmic Calendar</button>
+        </div>
+        <div id="calOut" style="display:none;margin-top:1.5rem">
+          <div class="verdict" id="calVerdict"></div>
+          <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin:.75rem 0 .3rem">
+            ✦ Gold border = master number day &nbsp;|&nbsp; Colored left edge = harmonious vibration
+          </div>
+          <div class="cal-grid" id="calDayNames"></div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="margin-top:1rem;font-size:.8rem;color:var(--muted);line-height:1.7" id="calBestDays"></div>
+        </div>
+      </div>
+
+      <!-- ── COLORS ── -->
+      <div class="tab-content" id="tab-colors">
+        <div class="section-header">
+          <div class="section-title">Color Branding Analysis</div>
+          <div class="section-sub">Numerology-based brand palette</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Life path or dominant number</label>
+            <input type="number" id="col_num" min="1" max="9" placeholder="1–9">
+          </div>
+          <div class="form-group">
+            <label>Business type</label>
+            <select id="col_type">
+              <option value="">— select —</option>
+              <option>Spiritual / Healing</option>
+              <option>Retreat / Hospitality</option>
+              <option>Coaching / Consulting</option>
+              <option>Creative / Arts</option>
+              <option>Wellness / Beauty</option>
+              <option>Business / Corporate</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="runColors()">Generate Brand Palette</button>
+          <button class="btn btn-ghost" onclick="loadClientToColors()">Load Current Client Number</button>
+        </div>
+        <div id="colorResults" style="display:none;margin-top:1.5rem">
+          <div class="verdict" id="colorVerdict"></div>
+          <div class="swatch-grid" id="swatchGrid"></div>
+          <div style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:1rem 0 .5rem">Typography & brand voice</div>
+          <div id="colorBrandVoice" class="reading-card"></div>
+        </div>
+      </div>
+
+      <!-- ── SCENTS ── -->
+      <div class="tab-content" id="tab-scents">
+        <div class="section-header">
+          <div class="section-title">Scents & Herbs</div>
+          <div class="section-sub">Vibrational plant medicine by number</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Dominant number</label>
+            <input type="number" id="sc_num" min="1" max="9" placeholder="1–9">
+          </div>
+          <div class="form-group">
+            <label>Purpose</label>
+            <select id="sc_purpose">
+              <option>Personal growth</option>
+              <option>Business launch</option>
+              <option>Healing & restoration</option>
+              <option>Abundance & prosperity</option>
+              <option>Creativity & expression</option>
+              <option>Love & relationships</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="runScents()">Generate Scent Profile</button>
+        </div>
+        <div id="scentResults" style="display:none;margin-top:1.5rem">
+          <div class="item-grid" id="scentGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── STONES ── -->
+      <div class="tab-content" id="tab-stones">
+        <div class="section-header">
+          <div class="section-title">Crystals & Stones</div>
+          <div class="section-sub">Gemstone allies by numerology vibration</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Dominant number</label>
+            <input type="number" id="st_num" min="1" max="9" placeholder="1–9">
+          </div>
+          <div class="form-group">
+            <label>Intention</label>
+            <select id="st_intent">
+              <option>Protection & grounding</option>
+              <option>Abundance & success</option>
+              <option>Clarity & intuition</option>
+              <option>Love & compassion</option>
+              <option>Creativity & joy</option>
+              <option>Spiritual connection</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="runStones()">Generate Stone Profile</button>
+        </div>
+        <div id="stoneResults" style="display:none;margin-top:1.5rem">
+          <div class="item-grid" id="stoneGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── REPORT ── -->
+      <div class="tab-content" id="tab-report">
+        <div class="section-header">
+          <div class="section-title">Generate Report</div>
+          <div class="section-sub">Canva-ready client profile</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Report type</label>
+            <select id="rep_type">
+              <option>Full personal profile</option>
+              <option>Business launch reading</option>
+              <option>Date selection guide</option>
+              <option>Branding & identity report</option>
+              <option>Combined full report</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tone</label>
+            <select id="rep_tone">
+              <option>Mystical & poetic</option>
+              <option>Professional & clear</option>
+              <option>Warm & personal</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+          <button class="btn btn-ghost" onclick="copyReport()">Copy to Clipboard</button>
+        </div>
+        <div class="copy-hint">Paste into Canva text blocks, Google Docs, or any design tool to build your client book.</div>
+        <div id="reportOutput" style="display:none"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ══ ACCESS CODES ══
+const ADMIN_CODE = 'STAR2025';   // You — full access
+const USER_CODE  = 'MOON2025';   // Partner — read/run only, no client edits
+
+let unlocked = false;
+let isAdmin = false;
+let session = { client: null, numData: null, astroData: null, colorData: null, scentData: null, stoneData: null, calData: null };
+let clients = JSON.parse(localStorage.getItem('sg_clients') || '[]');
+
+function tryUnlock() {
+  const v = document.getElementById('codeInput').value.toUpperCase().trim();
+  if (v === ADMIN_CODE) {
+    unlocked = true; isAdmin = true;
+    enterApp('Admin');
+  } else if (v === USER_CODE) {
+    unlocked = true; isAdmin = false;
+    enterApp('Practitioner');
+  } else {
+    document.getElementById('lockErr').textContent = 'Incorrect code. Please try again.';
+    document.getElementById('codeInput').value = '';
+  }
+}
+
+function enterApp(role) {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('app').style.flexDirection = 'column';
+  document.getElementById('roleTag').textContent = role;
+  // Only hide true app-system controls (code management, settings) from partner
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
+  // Both roles get full client management
+  renderClientList();
+}
+
+function logout() {
+  unlocked = false;
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('codeInput').value = '';
+  document.getElementById('lockErr').textContent = '';
+}
+
+// ══ NAVIGATION ══
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// ══ CLIENTS ══
+function saveClient() {
+  const c = {
+    id: Date.now(),
+    name: document.getElementById('c_name').value.trim(),
+    dob: document.getElementById('c_dob').value,
+    biz: document.getElementById('c_biz').value.trim(),
+    launch: document.getElementById('c_launch').value,
+    notes: document.getElementById('c_notes').value.trim(),
+    saved: new Date().toLocaleDateString()
+  };
+  if (!c.name) return;
+  clients.push(c);
+  localStorage.setItem('sg_clients', JSON.stringify(clients));
+  session.client = c;
+  document.getElementById('activeClientBadge').textContent = c.name;
+  renderClientList();
+}
+
+function loadClient(id) {
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  session.client = c;
+  document.getElementById('c_name').value = c.name;
+  document.getElementById('c_dob').value = c.dob;
+  document.getElementById('c_biz').value = c.biz;
+  document.getElementById('c_launch').value = c.launch;
+  document.getElementById('c_notes').value = c.notes;
+  document.getElementById('activeClientBadge').textContent = c.name;
+}
+
+function clearClient() {
+  ['c_name','c_dob','c_biz','c_launch','c_notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderClientList() {
+  const el = document.getElementById('clientList');
+  if (!clients.length) { el.innerHTML = '<div style="color:var(--muted);font-size:.8rem">No clients saved yet.</div>'; return; }
+  el.innerHTML = clients.map(c => `
+    <div class="client-row" onclick="loadClient(${c.id})">
+      <div>
+        <div class="client-name">${c.name}</div>
+        <div class="client-date">${c.dob || 'No DOB'} · ${c.biz || 'No business'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <div class="client-load">Load →</div>
+        <div class="client-load" style="color:var(--muted)" onclick="event.stopPropagation();deleteClient(${c.id})">✕</div>
+      </div>
+    </div>`).join('');
+}
+
+// ══ NUMEROLOGY ENGINE ══
+const NUM_MEANINGS = {
+  1:{label:'New beginnings',desc:'Leadership, independence, pioneering spirit. Strong launch vibration — original, bold, first mover.',tag:'Strong',tc:'s'},
+  2:{label:'Partnership',desc:'Diplomacy, cooperation, deep receptivity. Thrives on trusted relationships and curated word-of-mouth.',tag:'Favorable',tc:'i'},
+  3:{label:'Expression',desc:'Creativity, joy, communication. Highly auspicious for spiritual and creative brands. Draws enthusiasm.',tag:'Excellent',tc:'s'},
+  4:{label:'Foundation',desc:'Stability, hard work, solid systems. Excellent for building structure — can feel slower for launches.',tag:'Steady',tc:'w'},
+  5:{label:'Freedom & change',desc:'Dynamic, magnetic, adventurous. Attracts curious new clients. Stay focused to channel the energy.',tag:'Dynamic',tc:'i'},
+  6:{label:'Nurturer & sanctuary',desc:'Home, beauty, care, community. The quintessential hospitality number. Sacred space energy.',tag:'Excellent',tc:'s'},
+  7:{label:'Wisdom & depth',desc:'Mystical, analytical, spiritual. Perfect for esoteric and healing practices. Draws seekers of truth.',tag:'Strong',tc:'s'},
+  8:{label:'Abundance & power',desc:'Achievement, prosperity, executive energy. Quality over quantity. Premium pricing supported.',tag:'Powerful',tc:'s'},
+  9:{label:'Humanitarian',desc:'Compassion, completion, universal service. Ideal for healing and spiritual practices serving others.',tag:'Favorable',tc:'i'},
+  11:{label:'Master Intuition',desc:'Master Number — heightened intuition and spiritual illumination. Rare and powerful launch vibration.',tag:'Exceptional',tc:'s'},
+  22:{label:'Master Builder',desc:'Master Number — turns grand vision into lasting, tangible legacy. Highest practical achievement.',tag:'Exceptional',tc:'s'},
+  33:{label:'Master Teacher',desc:'Master Number — compassion, healing, blessing at the highest level of service.',tag:'Exceptional',tc:'s'}
+};
+
+function reduce(n) {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) n = String(n).split('').reduce((a,d) => a + parseInt(d), 0);
+  return n;
+}
+
+function pyth(name) {
+  const c={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+  return name.toUpperCase().split('').filter(l=>/[A-Z]/.test(l)).reduce((a,l)=>a+(c[l]||0),0);
+}
+
+function chald(name) {
+  const c={A:1,I:1,J:1,Q:1,Y:1,B:2,K:2,R:2,C:3,G:3,L:3,S:3,D:4,M:4,T:4,E:5,H:5,N:5,X:5,U:6,V:6,W:6,O:7,Z:7,F:8,P:8};
+  return name.toUpperCase().split('').filter(l=>/[A-Z]/.test(l)).reduce((a,l)=>a+(c[l]||0),0);
+}
+
+function ordn(name) {
+  return name.toUpperCase().split('').filter(l=>/[A-Z]/.test(l)).reduce((a,l)=>a+(l.charCodeAt(0)-64),0);
+}
+
+function kabb(name) {
+  const c={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,N:14,O:15,P:16,Q:17,R:18,S:19,T:20,U:21,V:22,W:23,X:24,Y:25,Z:26};
+  const sum = name.toUpperCase().split('').filter(l=>/[A-Z]/.test(l)).reduce((a,l)=>a+(c[l]||0),0);
+  const r = sum % 9; return r === 0 ? 9 : r;
+}
+
+function vedic(name) {
+  const c={A:1,I:1,J:1,Q:1,Y:1,B:2,K:2,R:2,C:3,G:3,L:3,S:3,D:4,M:4,T:4,E:5,H:5,N:5,X:5,U:6,V:6,W:6,O:7,Z:7,F:8,P:8};
+  return name.toUpperCase().split('').filter(l=>/[A-Z]/.test(l)).reduce((a,l)=>a+(c[l]||0),0);
+}
+
+function loShu(dob) {
+  const digits = dob.replace(/-/g,'').split('').map(Number).filter(d=>d>0);
+  const freq = {};
+  for(let i=1;i<=9;i++) freq[i]=0;
+  digits.forEach(d=>{if(d>=1&&d<=9)freq[d]++;});
+  return reduce(Object.values(freq).reduce((a,v)=>a+v,0));
+}
+
+function lifePath(dob) {
+  return reduce(dob.replace(/-/g,'').split('').reduce((a,d)=>a+parseInt(d),0));
+}
+
+function runNumerology() {
+  const name = document.getElementById('n_name').value.trim();
+  const date = document.getElementById('n_date').value;
+  if (!name && !date) return;
+
+  const systems = [];
+  if (name) {
+    systems.push({key:'Pythagorean',origin:'Ancient Greece',n:reduce(pyth(name)),region:'🌍 Western'});
+    systems.push({key:'Chaldean',origin:'Ancient Babylon',n:reduce(chald(name)),region:'🌍 Middle East'});
+    systems.push({key:'Ordinal',origin:'Universal',n:reduce(ordn(name)),region:'🌍 Universal'});
+    systems.push({key:'Kabbalah',origin:'Hebrew mysticism',n:kabb(name),region:'🌍 Jewish / Esoteric'});
+    systems.push({key:'Vedic / Tamil',origin:'Ancient India',n:reduce(vedic(name)),region:'🌍 South Asia'});
+  }
+  if (date) {
+    systems.push({key:'Life Path',origin:'All Western systems',n:lifePath(date),region:'🌍 Global'});
+    systems.push({key:'Lo Shu / Chinese',origin:'Chinese · 4,000 yrs',n:loShu(date),region:'🌍 East Asia'});
+  }
+
+  session.numData = { name, date, systems };
+
+  const grid = document.getElementById('numGrid');
+  grid.innerHTML = systems.map(s => {
+    const m = NUM_MEANINGS[s.n] || {label:'',desc:'',tag:'',tc:'i'};
+    return `<div class="result-card"><div class="num">${s.n}</div><div class="sys">${s.key}</div><div class="lbl">${m.label}</div></div>`;
+  }).join('');
+
+  const freq = {};
+  systems.forEach(s => freq[s.n] = (freq[s.n]||0)+1);
+  const top = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+  const dm = NUM_MEANINGS[parseInt(top[0])] || {label:'',desc:''};
+  document.getElementById('numVerdict').innerHTML = `
+    <div class="verdict-label">Dominant vibration: ${top[0]} — ${dm.label} (appears ${top[1]}× across systems)</div>
+    <div class="verdict-text">${dm.desc}</div>`;
+
+  document.getElementById('numCards').innerHTML = systems.map(s => {
+    const m = NUM_MEANINGS[s.n] || {label:'',desc:'',tag:'',tc:'i'};
+    return `<div class="reading-card">
+      <div class="rc-top"><span class="rc-num">${s.n}</span><span class="rc-sys">${s.key} · ${s.origin} · ${s.region}</span></div>
+      <div class="rc-lbl">${m.label}</div>
+      <div class="rc-desc">${m.desc}</div>
+      <span class="tag tag-${m.tc}">${m.tag}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('numResults').style.display = 'block';
+}
+
+function loadClientToNumerology() {
+  const c = session.client;
+  if (!c) return;
+  document.getElementById('n_name').value = c.biz || c.name;
+  document.getElementById('n_date').value = c.launch || c.dob;
+}
+
+function deleteClient(id) {
+  clients = clients.filter(x => x.id !== id);
+  localStorage.setItem('sg_clients', JSON.stringify(clients));
+  renderClientList();
+}
+
+// ══ ASTROLOGY ══
+function saveAstro() {
+  session.astroData = {
+    sun: document.getElementById('a_sun').value,
+    moon: document.getElementById('a_moon').value,
+    rising: document.getElementById('a_rising').value,
+    notes: document.getElementById('a_notes').value
+  };
+  alert('Astrology notes saved to session.');
+}
+
+// ══ CALENDAR ══
+function dayNum(year, month, day) {
+  const s = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  return lifePath(s);
+}
+
+function buildCalendar() {
+  const num = parseInt(document.getElementById('cal_num').value) || 6;
+  const mv = document.getElementById('cal_month').value;
+  if (!mv) return;
+  const [year, month] = mv.split('-').map(Number);
+  const monthDate = new Date(year, month - 1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const startDay = monthDate.getDay();
+  const monthName = monthDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  const harmony = {
+    1:[1,3,5,9],2:[2,4,6,8],3:[1,3,5,9],4:[2,4,8],
+    5:[1,3,5,7],6:[2,3,6,9],7:[5,7,1],8:[2,4,8,6],9:[1,3,6,9]
+  };
+  const harmDays = harmony[num] || [];
+
+  const namesEl = document.getElementById('calDayNames');
+  namesEl.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d =>
+    `<div class="cal-day-name">${d}</div>`).join('');
+
+  const calEl = document.getElementById('calGrid');
+  let html = '';
+  for (let i = 0; i < startDay; i++) html += '<div class="cal-day empty"></div>';
+
+  const today = new Date();
+  const bestDays = [];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dn = dayNum(year, month - 1, d);
+    const isMaster = [11,22,33].includes(dn);
+    const isHarm = harmDays.includes(dn % 9 === 0 ? 9 : dn % 9);
+    const isToday = (today.getFullYear()===year && today.getMonth()===month-1 && today.getDate()===d);
+    const cls = ['cal-day'];
+    if (isMaster) cls.push('master');
+    if (isToday) cls.push('today');
+    if (!isMaster && isHarm) cls.push('num' + (dn > 9 ? dn % 9 || 9 : dn));
+    if (isHarm || isMaster) bestDays.push({d, dn, master: isMaster});
+    html += `<div class="${cls.join(' ')}" title="Day energy: ${dn}">
+      <div class="d-num">${d}</div>
+      <div class="d-vibe">${dn}${isMaster ? ' ✦' : ''}</div>
+    </div>`;
+  }
+  calEl.innerHTML = html;
+
+  const m = NUM_MEANINGS[num] || {label:'',desc:''};
+  document.getElementById('calVerdict').innerHTML = `
+    <div class="verdict-label">${monthName} · Key number ${num} — ${m.label}</div>
+    <div class="verdict-text">${m.desc}</div>`;
+
+  const topDays = bestDays.slice(0,5).map(x => `${x.d}${x.master ? ' ✦ (Master)' : ''} · day energy ${x.dn}`).join('  ·  ');
+  document.getElementById('calBestDays').innerHTML = `<strong style="color:var(--gold);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase">Best days this month:</strong><br>${topDays || 'No peak days found — try adjacent numbers.'}`;
+
+  session.calData = { num, month: monthName, bestDays };
+  document.getElementById('calOut').style.display = 'block';
+}
+
+// ══ COLORS ══
+const COLOR_DATA = {
+  1:{colors:[{name:'Solar gold',hex:'#C9A84C',role:'Primary'},{name:'Flame red',hex:'#C44B2B',role:'Accent'},{name:'Ivory cream',hex:'#F5F0E8',role:'Background'},{name:'Ebony',hex:'#1A1410',role:'Text'}],voice:'Bold, commanding, direct. Leadership language. Short, powerful sentences. Never apologetic.',fonts:'Display: Playfair Display or Bodoni. Body: Freight Text. Voice: Authoritative, inspired.'},
+  2:{colors:[{name:'Moonstone',hex:'#C8C5D8',role:'Primary'},{name:'Blush rose',hex:'#E8B4B8',role:'Accent'},{name:'Soft white',hex:'#FAF8F5',role:'Background'},{name:'Charcoal',hex:'#2C2830',role:'Text'}],voice:'Gentle, flowing, collaborative. Soft invitations rather than commands. Warmth and presence.',fonts:'Display: EB Garamond italic. Body: Lato Light. Voice: Whispering, intimate, graceful.'},
+  3:{colors:[{name:'Violet dream',hex:'#7B5EA7',role:'Primary'},{name:'Citrine',hex:'#E8C84A',role:'Accent'},{name:'Lavender mist',hex:'#F2EEF8',role:'Background'},{name:'Deep plum',hex:'#2C1A3E',role:'Text'}],voice:'Playful, expressive, joyful. Storytelling language. Metaphors and vivid imagery welcome.',fonts:'Display: Abril Fatface or Libre Baskerville. Body: Nunito. Voice: Celebratory, luminous.'},
+  4:{colors:[{name:'Forest',hex:'#2D5A3D',role:'Primary'},{name:'Stone grey',hex:'#7A7570',role:'Accent'},{name:'Parchment',hex:'#F0EBE0',role:'Background'},{name:'Dark earth',hex:'#1C1810',role:'Text'}],voice:'Reliable, structured, grounded. Step-by-step clarity. No fluff — every word earns its place.',fonts:'Display: Roboto Slab. Body: Source Serif Pro. Voice: Trustworthy, methodical, solid.'},
+  5:{colors:[{name:'Electric teal',hex:'#2ABFBF',role:'Primary'},{name:'Coral spark',hex:'#E8704A',role:'Accent'},{name:'Cool white',hex:'#F5F8FA',role:'Background'},{name:'Deep navy',hex:'#0D1B2A',role:'Text'}],voice:'Dynamic, adventurous, free. Invitation to explore. Energy and momentum in every sentence.',fonts:'Display: Montserrat Bold. Body: Open Sans. Voice: Spontaneous, exciting, conversational.'},
+  6:{colors:[{name:'Dusty rose',hex:'#C4837A',role:'Primary'},{name:'Sage green',hex:'#7A9E7E',role:'Accent'},{name:'Linen',hex:'#F5F0EA',role:'Background'},{name:'Warm chocolate',hex:'#2E1F1A',role:'Text'}],voice:'Nurturing, warm, welcoming. Sanctuary language. You feel held, seen, cared for.',fonts:'Display: Cormorant Garamond. Body: Lora. Voice: Tender, home-like, restorative.'},
+  7:{colors:[{name:'Midnight indigo',hex:'#1E1B4B',role:'Primary'},{name:'Silver moon',hex:'#A8B2C8',role:'Accent'},{name:'Deep night',hex:'#0D0B18',role:'Background'},{name:'Starlight',hex:'#E8E4F0',role:'Text'}],voice:'Mysterious, wise, contemplative. Asks questions rather than states answers. Depth over breadth.',fonts:'Display: Cinzel or Trajan Pro. Body: Crimson Text. Voice: Oracular, profound, still.'},
+  8:{colors:[{name:'Obsidian',hex:'#1A1A1A',role:'Primary'},{name:'True gold',hex:'#C9A84C',role:'Accent'},{name:'Platinum',hex:'#E8E8E8',role:'Background'},{name:'Pure black',hex:'#0A0A0A',role:'Text'}],voice:'Executive, abundant, authoritative. Premium language. Every offering is investment, not expense.',fonts:'Display: Didot or Chronicle Display. Body: Optima. Voice: Luxurious, decisive, powerful.'},
+  9:{colors:[{name:'Deep teal',hex:'#2A6B6B',role:'Primary'},{name:'Warm amber',hex:'#C9883A',role:'Accent'},{name:'Cloud',hex:'#F0F5F5',role:'Background'},{name:'Charcoal',hex:'#1A2020',role:'Text'}],voice:'Compassionate, universal, inclusive. Language of service and giving. We, not I.',fonts:'Display: Libre Baskerville. Body: Merriweather. Voice: Humanitarian, wise, encompassing.'}
+};
+
+function runColors() {
+  const num = parseInt(document.getElementById('col_num').value);
+  if (!num || num < 1 || num > 9) return;
+  const cd = COLOR_DATA[num];
+  if (!cd) return;
+  session.colorData = { num, ...cd };
+
+  const btype = document.getElementById('col_type').value;
+  document.getElementById('colorVerdict').innerHTML = `
+    <div class="verdict-label">Number ${num} brand palette — ${NUM_MEANINGS[num]?.label || ''}</div>
+    <div class="verdict-text">${NUM_MEANINGS[num]?.desc || ''} ${btype ? `<br>Tuned for: ${btype}` : ''}</div>`;
+
+  document.getElementById('swatchGrid').innerHTML = cd.colors.map(c => `
+    <div class="swatch">
+      <div class="swatch-color" style="background:${c.hex}"></div>
+      <div class="swatch-info">
+        <span class="swatch-name">${c.name}</span>
+        ${c.hex} · ${c.role}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('colorBrandVoice').innerHTML = `
+    <div class="rc-lbl" style="margin-bottom:.5rem">Brand voice & typography</div>
+    <div class="rc-desc"><strong>Voice:</strong> ${cd.voice}</div>
+    <div class="rc-desc" style="margin-top:.5rem"><strong>Typography:</strong> ${cd.fonts}</div>`;
+
+  document.getElementById('colorResults').style.display = 'block';
+}
+
+function loadClientToColors() {
+  if (!session.numData) return;
+  const dom = session.numData.systems?.sort((a,b) => {
+    const f={};
+    session.numData.systems.forEach(s=>f[s.n]=(f[s.n]||0)+1);
+    return f[b.n]-f[a.n];
+  })[0];
+  if (dom) { document.getElementById('col_num').value = dom.n > 9 ? (dom.n % 9 || 9) : dom.n; }
+}
+
+// ══ SCENTS ══
+const SCENT_DATA = {
+  1:{items:[{icon:'🌹',name:'Frankincense',sub:'Power, clarity, spiritual leadership. Opens the crown and commands presence.'},{icon:'🌿',name:'Cedar',sub:'Grounding the pioneer. Strength and independence without rigidity.'},{icon:'🌸',name:'Bergamot',sub:'Confidence and original thinking. Solar plexus activator.'},{icon:'🌱',name:'Ginger root',sub:'Fire and initiative. Ignites action and new beginnings.'}]},
+  2:{items:[{icon:'🌕',name:'Jasmine',sub:'Lunar softness, partnership, emotional receptivity and grace.'},{icon:'🌿',name:'Chamomile',sub:'Diplomatic harmony. Soothes tension between people.'},{icon:'🌸',name:'Rose',sub:'Heart opening, cooperation, deep empathy and love.'},{icon:'🍃',name:'Ylang ylang',sub:'Feminine partnership energy. Balance and gentle attraction.'}]},
+  3:{items:[{icon:'🌻',name:'Orange blossom',sub:'Joy, creativity, and self-expression. The happiness vibration.'},{icon:'🌿',name:'Lemon verbena',sub:'Mental clarity for creative leaps. Uplifting communication.'},{icon:'🌸',name:'Neroli',sub:'Creative confidence and playful spiritual expansion.'},{icon:'🍋',name:'Grapefruit',sub:'Optimism, freshness, and inspired social energy.'}]},
+  4:{items:[{icon:'🌲',name:'Pine',sub:'Foundation, structure, and earthy reliability.'},{icon:'🌿',name:'Vetiver',sub:'Deep grounding. Connection to soil, stability, and roots.'},{icon:'🌱',name:'Patchouli',sub:'Material world mastery. Anchors vision into reality.'},{icon:'🍃',name:'Oakmoss',sub:'Longevity, tradition, and the wisdom of systems.'}]},
+  5:{items:[{icon:'💨',name:'Peppermint',sub:'Freedom, mental agility, and the energy of change.'},{icon:'🌿',name:'Eucalyptus',sub:'Clear airways for new adventures. Breaking through limits.'},{icon:'🌸',name:'Clary sage',sub:'Inspired vision and the courage to leap into the unknown.'},{icon:'🍃',name:'Spearmint',sub:'Playful exploration and quick, curious energy.'}]},
+  6:{items:[{icon:'🌹',name:'Rose absolute',sub:'The supreme nurturer. Home, beauty, unconditional love.'},{icon:'🌿',name:'Lavender',sub:'Sanctuary, calm, and the healing of safe space.'},{icon:'🌸',name:'Geranium',sub:'Community harmony, care, and family resonance.'},{icon:'🍃',name:'Melissa (Lemon balm)',sub:'Restoration, gentle comfort, and heart-centered healing.'}]},
+  7:{items:[{icon:'🌙',name:'Sandalwood',sub:'Mystical depth, inner wisdom, and spiritual contemplation.'},{icon:'🌿',name:'Mugwort',sub:'Third eye activation and visionary dream work.'},{icon:'🌸',name:'Blue lotus',sub:'Ancient mysticism and direct connection to higher knowing.'},{icon:'🍃',name:'Elemi',sub:'Spiritual clarity and the bridge between worlds.'}]},
+  8:{items:[{icon:'👑',name:'Oud (Agarwood)',sub:'Rare, powerful, luxurious. The scent of abundance and authority.'},{icon:'🌿',name:'Myrrh',sub:'Ancient wealth and material mastery. Sacred commerce.'},{icon:'🌸',name:'Black pepper',sub:'Executive drive. Ignites ambition and decisive action.'},{icon:'🍃',name:'Amber resin',sub:'Timeless prosperity. Warmth of generational wealth.'}]},
+  9:{items:[{icon:'🌍',name:'Frankincense & myrrh',sub:'Universal spiritual service and the gift of healing.'},{icon:'🌿',name:'Lotus',sub:'Compassion, transcendence, and universal love.'},{icon:'🌸',name:'White sage',sub:'Purification and the clearing of space for new humanity.'},{icon:'🍃',name:'Spikenard',sub:'Ancient humanitarian medicine. Given freely, received gratefully.'}]}
+};
+
+function runScents() {
+  const num = parseInt(document.getElementById('sc_num').value);
+  if (!num || !SCENT_DATA[num]) return;
+  const sd = SCENT_DATA[num];
+  session.scentData = { num, items: sd.items };
+  document.getElementById('scentGrid').innerHTML = sd.items.map(i => `
+    <div class="item-card">
+      <div class="ic-icon">${i.icon}</div>
+      <div class="ic-name">${i.name}</div>
+      <div class="ic-sub">${i.sub}</div>
+    </div>`).join('');
+  document.getElementById('scentResults').style.display = 'block';
+}
+
+// ══ STONES ══
+const STONE_DATA = {
+  1:{items:[{icon:'🔴',name:'Ruby',sub:'Power, passion, and the fire of new beginnings. Solar plexus to heart.'},{icon:'🟠',name:'Carnelian',sub:'Initiative, confidence, and original creative drive.'},{icon:'🔶',name:'Sunstone',sub:'Leadership, joy, and the warmth of solar energy.'},{icon:'⬜',name:'Clear quartz',sub:'Amplifies intention. The pioneer\'s amplifier.'}]},
+  2:{items:[{icon:'🌙',name:'Moonstone',sub:'Lunar receptivity, intuition, and deep emotional harmony.'},{icon:'🔵',name:'Aquamarine',sub:'Partnership, clear communication, and gentle truth.'},{icon:'🟣',name:'Rose quartz',sub:'The heart stone. Unconditional love and healing connection.'},{icon:'⚪',name:'Pearl',sub:'Wisdom, cooperation, and the grace of feminine energy.'}]},
+  3:{items:[{icon:'🟣',name:'Amethyst',sub:'Creative intuition and joyful spiritual expression.'},{icon:'🔵',name:'Blue topaz',sub:'Communication, creativity, and inspired self-expression.'},{icon:'🟡',name:'Citrine',sub:'The happy stone. Optimism, creativity, and manifestation.'},{icon:'🌈',name:'Labradorite',sub:'Magical thinking and the gifts of creative surprise.'}]},
+  4:{items:[{icon:'🟢',name:'Malachite',sub:'Grounding transformation. Sacred patterns in nature.'},{icon:'🟤',name:'Smoky quartz',sub:'Deep earth grounding and the wisdom of practical patience.'},{icon:'⬛',name:'Black tourmaline',sub:'Foundation protection. Shields the builder\'s work.'},{icon:'🟫',name:'Tiger\'s eye',sub:'Steady courage, discipline, and practical manifestation.'}]},
+  5:{items:[{icon:'🔵',name:'Turquoise',sub:'Freedom, adventure, and the spirit of the open road.'},{icon:'🟢',name:'Green aventurine',sub:'Lucky changes and the heart open to new experience.'},{icon:'🔵',name:'Blue lace agate',sub:'Calm communication amid change and dynamic movement.'},{icon:'🌈',name:'Fluorite',sub:'Mental agility and clarity for quick, inspired decisions.'}]},
+  6:{items:[{icon:'🟢',name:'Jade',sub:'The supreme nurturer. Home, family, and heart harmony.'},{icon:'🟣',name:'Rhodonite',sub:'Compassionate care and emotional healing for others.'},{icon:'🔵',name:'Blue calcite',sub:'Sanctuary energy. Soothes the healer and the space.'},{icon:'💚',name:'Green tourmaline',sub:'Abundant heart energy and the gift of giving freely.'}]},
+  7:{items:[{icon:'🔵',name:'Lapis lazuli',sub:'Third eye wisdom, ancient knowledge, and inner truth.'},{icon:'⚫',name:'Black obsidian',sub:'Mystical depth and ruthless spiritual clarity.'},{icon:'🔵',name:'Azurite',sub:'Visionary insight and connection to higher dimensions.'},{icon:'🌙',name:'Selenite',sub:'Divine light and the clarity of spiritual knowing.'}]},
+  8:{items:[{icon:'⬛',name:'Black onyx',sub:'Power, protection, and executive authority.'},{icon:'💛',name:'Pyrite (Fool\'s gold)',sub:'True abundance magnet. Material prosperity and strength.'},{icon:'🟤',name:'Petrified wood',sub:'Ancient prosperity. Generational wealth and legacy.'},{icon:'🔴',name:'Garnet',sub:'Manifestation power and the courage of committed success.'}]},
+  9:{items:[{icon:'🌈',name:'Sugilite',sub:'Universal love, healing the collective, and selfless service.'},{icon:'💜',name:'Charoite',sub:'Spiritual transformation and the gift of the humanitarian.'},{icon:'🔵',name:'Larimar',sub:'Oceanic compassion and the healing of the whole world.'},{icon:'⚪',name:'White howlite',sub:'Patience, wisdom, and calm in service to all beings.'}]}
+};
+
+function runStones() {
+  const num = parseInt(document.getElementById('st_num').value);
+  if (!num || !STONE_DATA[num]) return;
+  const sd = STONE_DATA[num];
+  session.stoneData = { num, items: sd.items };
+  document.getElementById('stoneGrid').innerHTML = sd.items.map(i => `
+    <div class="item-card">
+      <div class="ic-icon">${i.icon}</div>
+      <div class="ic-name">${i.name}</div>
+      <div class="ic-sub">${i.sub}</div>
+    </div>`).join('');
+  document.getElementById('stoneResults').style.display = 'block';
+}
+
+// ══ REPORT GENERATOR ══
+function generateReport() {
+  const type = document.getElementById('rep_type').value;
+  const tone = document.getElementById('rep_tone').value;
+  const c = session.client;
+  const n = session.numData;
+  const a = session.astroData;
+  const col = session.colorData;
+  const sc = session.scentData;
+  const st = session.stoneData;
+  const cal = session.calData;
+
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  let out = '';
+
+  out += `✦ STARGAZER NUMEROLOGY & ASTROLOGY STUDIO ✦\n`;
+  out += `${'─'.repeat(48)}\n\n`;
+  if (c) {
+    out += `CLIENT: ${c.name}\n`;
+    if (c.dob) out += `DATE OF BIRTH: ${c.dob}\n`;
+    if (c.biz) out += `BUSINESS / PROJECT: ${c.biz}\n`;
+    if (c.launch) out += `LAUNCH DATE: ${c.launch}\n`;
+    out += `REPORT DATE: ${date}\n`;
+    out += `REPORT TYPE: ${type}\n\n`;
+  }
+
+  if (n && n.systems) {
+    out += `✦ NUMEROLOGY PROFILE — ALL 7 WORLD SYSTEMS\n`;
+    out += `${'─'.repeat(40)}\n`;
+    n.systems.forEach(s => {
+      const m = NUM_MEANINGS[s.n] || {};
+      out += `\n${s.key.toUpperCase()} (${s.origin})\n`;
+      out += `Number: ${s.n} — ${m.label || ''}\n`;
+      out += `${m.desc || ''}\n`;
+    });
+    const freq = {};
+    n.systems.forEach(s => freq[s.n] = (freq[s.n]||0)+1);
+    const top = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+    const dm = NUM_MEANINGS[parseInt(top[0])] || {};
+    out += `\nDOMINANT VIBRATION: ${top[0]} — ${dm.label}\n`;
+    out += `${dm.desc}\n\n`;
+  }
+
+  if (a && (a.sun || a.moon || a.rising)) {
+    out += `✦ ASTROLOGY\n${'─'.repeat(40)}\n`;
+    if (a.sun) out += `Sun Sign: ${a.sun}\n`;
+    if (a.moon) out += `Moon Sign: ${a.moon}\n`;
+    if (a.rising) out += `Rising Sign: ${a.rising}\n`;
+    if (a.notes) out += `Notes: ${a.notes}\n`;
+    out += `\n`;
+  }
+
+  if (col) {
+    out += `✦ BRAND COLOR PALETTE — NUMBER ${col.num}\n${'─'.repeat(40)}\n`;
+    col.colors.forEach(c2 => out += `${c2.role}: ${c2.name} ${c2.hex}\n`);
+    out += `\nBrand Voice: ${col.voice}\n`;
+    out += `Typography: ${col.fonts}\n\n`;
+  }
+
+  if (sc) {
+    out += `✦ SACRED SCENTS & HERBS — NUMBER ${sc.num}\n${'─'.repeat(40)}\n`;
+    sc.items.forEach(i => out += `${i.name}: ${i.sub}\n`);
+    out += `\n`;
+  }
+
+  if (st) {
+    out += `✦ CRYSTALS & STONES — NUMBER ${st.num}\n${'─'.repeat(40)}\n`;
+    st.items.forEach(i => out += `${i.name}: ${i.sub}\n`);
+    out += `\n`;
+  }
+
+  if (cal) {
+    out += `✦ COSMIC CALENDAR — ${cal.month}\n${'─'.repeat(40)}\n`;
+    out += `Key number: ${cal.num}\n`;
+    if (cal.bestDays.length) {
+      out += `Peak days: ${cal.bestDays.map(d=>d.d).join(', ')}\n`;
+    }
+    out += `\n`;
+  }
+
+  if (c?.notes) {
+    out += `✦ SESSION NOTES\n${'─'.repeat(40)}\n${c.notes}\n\n`;
+  }
+
+  out += `${'─'.repeat(48)}\n`;
+  out += `Generated by Stargazer Professional Suite · Private & Confidential\n`;
+  out += `Paste this report into Canva to create your client book.\n`;
+
+  const el = document.getElementById('reportOutput');
+  el.textContent = out;
+  el.style.display = 'block';
+}
+
+function copyReport() {
+  const text = document.getElementById('reportOutput').textContent;
+  if (!text) { generateReport(); }
+  navigator.clipboard.writeText(document.getElementById('reportOutput').textContent)
+    .then(() => alert('Report copied to clipboard! Paste into Canva or Google Docs.'))
+    .catch(() => {
+      const el = document.getElementById('reportOutput');
+      el.select && el.select();
+      document.execCommand('copy');
+      alert('Report copied!');
+    });
+}
+
+// Init
+renderClientList();
+</script>
+</body>
+</html>

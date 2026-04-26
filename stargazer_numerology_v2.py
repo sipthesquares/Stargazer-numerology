@@ -7,7 +7,7 @@ import os
 # ─────────────────────────────────────────
 #  VERSION INFO  (update this each release)
 # ─────────────────────────────────────────
-APP_VERSION = "2.0.0"
+APP_VERSION = "3.0.0"
 RELEASE_DATE = "2026-04-26"
 RELEASE_NOTES = """
 **What's new in v2.0:**
